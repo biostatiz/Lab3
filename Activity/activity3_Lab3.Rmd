@@ -30,6 +30,7 @@ polygon(coord.x, coord.y, col = 2)
 Write R code using ggplot2 to recreate the density plot with area under the curve.
 ```{r}
 x <- seq(-4, 4, 0.1)
+
 ggplot(data = NULL, aes(x = x, y = dnorm(x))) +
   geom_line() +
   geom_polygon(data = NULL,
@@ -37,35 +38,52 @@ ggplot(data = NULL, aes(x = x, y = dnorm(x))) +
                    y = c(0,dnorm(seq(-4,-1, by=0.1)), 0)),
                fill = "red", col = 'black') +
   labs(x = "X", y = "Density", title = "Pr(X <= −1)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 20)) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  theme(plot.title = element_text(hjust = 0.5, size = 20),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))
 ```
 
 ### Problem 2
   * Load gapminder data.
   * Create a plot for 2007 year data only: "GDP per capita" vs. "Life expectancy"
   * Annotate european countries with "GDP per capita" > 40000
+
+#### 1) Using geom_text()
 ```{r}
-temp <- gapminder %>% filter(year == 2007, continent == 'Europe') %>% select(country, gdpPercap, lifeExp)
-temp2 <- temp %>% filter(gdpPercap > 40000)
+temp <- gapminder %>%
+  filter(year == 2007) %>%
+  select(country, continent, gdpPercap, lifeExp)
+
+temp2 <- temp %>%
+  filter(continent == 'Europe', gdpPercap > 40000)
 
 temp %>% ggplot(aes(x=gdpPercap, y=lifeExp)) + 
   geom_point() +
   theme_bw() +
   labs(x = "GDP per capita", y = "life expectancy") +
-  geom_text(data = temp2, aes(x = gdpPercap, y = lifeExp, label = country),
-            nudge_y = -.5)
+  geom_text(data = temp2,
+            aes(x = gdpPercap, y = lifeExp, label = country),
+            color = 'blue',
+            nudge_y = -1)
 ```
   
+#### 2) Using geom_text_reple()
 ```{r}
-temp <- gapminder %>% filter(year == 2007, continent == 'Europe') %>% select(country, gdpPercap, lifeExp)
-temp2 <- temp %>% filter(gdpPercap > 40000)
+temp <- gapminder %>%
+  filter(year == 2007) %>%
+  select(country, continent, gdpPercap, lifeExp)
 
-temp %>% ggplot(aes(x=gdpPercap, y=lifeExp)) + 
+temp2 <- temp %>%
+  filter(continent == 'Europe', gdpPercap > 40000)
+
+temp %>%
+  ggplot(aes(x = gdpPercap, y = lifeExp)) + 
   geom_point() +
   theme_bw() +
   labs(x = "GDP per capita", y = "life expectancy") +
-  geom_text_repel(data = temp2, label = temp2$country)
+  geom_text_repel(data = temp2,
+                  label = temp2$country,
+                  color = 'blue',
+                  force = 0,
+                  nudge_y = -1)
 ```
-
